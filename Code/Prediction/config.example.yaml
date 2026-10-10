@@ -1,0 +1,125 @@
+metadata_csv: data/metadata.csv
+output_dir: outputs/example_run
+
+id_column: sample_id
+role_column: role
+center_column: center
+train_role: train
+
+primary_modality: Multimodal
+single_sequence_modalities: [T1, T1ce, T2, FLAIR]
+
+feature_inputs:
+  Multimodal:
+    brainiac: data/brainiac_multimodal.csv
+    radiomics: data/radiomics_multimodal_447.csv
+  T1:
+    brainiac: data/brainiac_t1.csv
+    radiomics: data/radiomics_t1_90.csv
+  T1ce:
+    brainiac: data/brainiac_t1ce.csv
+    radiomics: data/radiomics_t1ce_90.csv
+  T2:
+    brainiac: data/brainiac_t2.csv
+    radiomics: data/radiomics_t2_90.csv
+  FLAIR:
+    brainiac: data/brainiac_flair.csv
+    radiomics: data/radiomics_flair_90.csv
+
+folds: 5
+control_max_epochs: 200
+bootstrap_iterations: 1000
+base_seed: 2026
+device: null
+
+endpoints:
+  Grade:
+    column: Grade_high_binary
+    candidates:
+      - feature_route: joint
+        brainiac_top_k: 16
+        radiomics_top_k: 16
+        joint_top_k: 32
+        hidden_layers: [512, 256]
+        activation: relu
+        dropout: 0.0
+        loss: focal
+        focal_gamma: 1.0
+        learning_rate: 0.0003
+        weight_decay: 0.00001
+        max_epochs: 200
+        batch_size: 32
+        seed: 4
+
+  Invasion:
+    column: Invasion_pos_binary
+    candidates:
+      - feature_route: separate
+        brainiac_top_k: 64
+        radiomics_top_k: 64
+        joint_top_k: 0
+        hidden_layers: [64]
+        activation: relu
+        dropout: 0.1
+        loss: focal
+        focal_gamma: 2.0
+        learning_rate: 0.0001
+        weight_decay: 0.001
+        max_epochs: 200
+        batch_size: 32
+        seed: 4
+
+  Ki-67:
+    column: Ki67_high_ge7_binary
+    candidates:
+      - feature_route: separate
+        brainiac_top_k: 32
+        radiomics_top_k: 32
+        joint_top_k: 0
+        hidden_layers: [256, 128]
+        activation: relu
+        dropout: 0.4
+        loss: weighted_bce
+        focal_gamma: 2.0
+        learning_rate: 0.001
+        weight_decay: 0.0
+        max_epochs: 200
+        batch_size: 32
+        seed: 0
+
+  SSTR2:
+    column: SSTR2_high_binary
+    candidates:
+      - feature_route: separate
+        brainiac_top_k: 16
+        radiomics_top_k: 16
+        joint_top_k: 0
+        hidden_layers: [512, 256]
+        activation: silu
+        dropout: 0.5
+        loss: weighted_bce
+        focal_gamma: 2.0
+        learning_rate: 0.0001
+        weight_decay: 0.0001
+        max_epochs: 200
+        batch_size: 128
+        seed: 1
+
+  PR:
+    column: PR_high_binary
+    candidates:
+      - feature_route: separate
+        brainiac_top_k: 128
+        radiomics_top_k: 32
+        joint_top_k: 0
+        hidden_layers: [512]
+        activation: silu
+        dropout: 0.0
+        loss: focal
+        focal_gamma: 2.0
+        learning_rate: 0.003
+        weight_decay: 0.001
+        max_epochs: 200
+        batch_size: 64
+        seed: 1
+
